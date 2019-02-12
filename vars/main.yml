@@ -1,7 +1,3 @@
 # Public variables.
-standard_users:
-- ldumont
-- nnadeau
-- pgrenaud
 
 # Please create a vaults_vars.yml for private vars that need to be encrypted.
