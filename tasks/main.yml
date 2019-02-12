@@ -1,0 +1,26 @@
+---
+
+- name: Add Ansible standard-user to be used for all playbooks. No password - only SSH key auth.
+  user:
+    name: ansible-robot
+    state: present
+    comment: "User for all ansible playbooks and actions"
+    groups: sudo
+    append: yes
+
+- name: Add all standard users.
+  user:
+    name: "{{ item }}"
+    group: sudo
+    password: "{{ vault_linux_password }}"
+    state: present
+    shell: /bin/bash
+  loop: "{{ vault_standard_users }}"
+
+- name: Allow privilege escalation without password.
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%sudo ALL\='
+    line: '%sudo ALL=(ALL) NOPASSWD:ALL'
+    validate: 'visudo -cf %s'
