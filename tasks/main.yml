@@ -14,6 +14,7 @@
     group: sudo
     password: "{{ vault_linux_password }}"
     state: present
+    append: yes
     shell: /bin/bash
   loop: "{{ vault_standard_users }}"
 
