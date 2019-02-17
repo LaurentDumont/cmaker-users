@@ -18,6 +18,12 @@
     shell: /bin/bash
   loop: "{{ vault_standard_users }}"
 
+- name: Add groups based on users name.
+  group:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ vault_standard_users }}"
+
 - name: Allow privilege escalation without password.
   lineinfile:
     dest: /etc/sudoers
