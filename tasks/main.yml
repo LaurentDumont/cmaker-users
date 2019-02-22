@@ -8,6 +8,12 @@
     groups: sudo
     append: yes
 
+- name: Add ansible-robot user public key login.
+  authorized_key:
+    user: ansible-robot
+    state: present
+    key: https://github.com/laurentdumont.keys
+
 - name: Add all standard users.
   user:
     name: "{{ item }}"
