@@ -7,6 +7,17 @@
     comment: "User for all ansible playbooks and actions"
     groups: sudo
     append: yes
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Add Ansible standard-user to be used for all playbooks. No password - only SSH key auth.
+  user:
+    name: ansible-robot
+    state: present
+    comment: "User for all ansible playbooks and actions"
+    groups: wheel
+    append: yes
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
 
 - name: Add ansible-robot user public key login.
   authorized_key:
@@ -23,6 +34,19 @@
     append: yes
     shell: /bin/bash
   loop: "{{ vault_standard_users }}"
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Add all standard users.
+  user:
+    name: "{{ item }}"
+    group: wheel
+    password: "{{ vault_linux_password }}"
+    state: present
+    append: yes
+    shell: /bin/bash
+  loop: "{{ vault_standard_users }}"
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
 
 - name: Add groups based on users name.
   group:
@@ -37,3 +61,13 @@
     regexp: '^%sudo ALL\='
     line: '%sudo ALL=(ALL) NOPASSWD:ALL'
     validate: 'visudo -cf %s'
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Allow privilege escalation without password.
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%sudo ALL\='
+    line: '%wheel ALL=(ALL) NOPASSWD:ALL'
+    validate: 'visudo -cf %s'
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
